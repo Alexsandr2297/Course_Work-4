@@ -1,0 +1,87 @@
+<!-- Рассылка -->
+{% extends 'base.html' %}
+{% block content %}
+
+{% if mailing %}
+<h4>Рассылка #{{ mailing.id }}</h4>
+
+<p class="card-text">
+    <strong>Активность:</strong>
+    {% if mailing.is_active %}
+    <span class="badge bg-success">Активна</span>
+    {% else %}
+    <span class="badge bg-danger">Отключена</span>
+    {% endif %}
+</p>
+
+<p class="card-text">
+    <strong>Статус:</strong>
+    <span class="badge
+            {% if mailing.status == 'Создана' %}bg-secondary
+            {% elif mailing.status == 'Запущена' %}bg-success
+            {% else %}bg-danger{% endif %}">
+            {{ mailing.status }}
+        </span>
+</p>
+<p class="card-text"><strong>Начало:</strong> {{ mailing.start_time|date:"d.m.Y H:i" }}</p>
+<p class="card-text"><strong>Окончание:</strong> {{ mailing.end_time|date:"d.m.Y H:i" }}</p>
+<p class="card-text"><strong>Сообщение:</strong> {{ mailing.message.subject_letter }}</p>
+<p class="card-text"><strong>Получатели:</strong></p>
+<ul>
+    {% for recipient in mailing.recipients.all %}
+    <li>{{ recipient.email }} ({{ recipient.full_name }})</li>
+    {% endfor %}
+</ul>
+
+<!-- История отправок -->
+{% if attempts %}
+<hr>
+<h5>История отправок</h5>
+<table class="table table-striped table-sm">
+    <thead>
+    <tr>
+        <th>Дата</th>
+        <th>Получатель</th>
+        <th>Статус</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for attempt in attempts %}
+    <tr class="{% if attempt.status == 'Успешно' %}table-success{% else %}table-danger{% endif %}">
+        <td>{{ attempt.sent_at|date:"d.m.Y H:i:s" }}</td>
+        <td>{{ attempt.recipient.email }}</td>
+        <td>{{ attempt.status }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<div class="btn-group mt-3">
+    <form method="post" action="{% url 'mailmaster:send_mailing' mailing.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" {% if not mailing.is_active %}disabled{% endif %}>Запустить
+        </button>
+    </form>
+
+    {% if perms.mailmaster.can_disable_mailing and mailing.is_active %}
+    <form method="post" action="{% url 'mailmaster:disable_mailing' mailing.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Отключить рассылку</button>
+    </form>
+    {% endif %}
+
+    <a class="btn btn-warning" href="{% url 'mailmaster:mailing_update' mailing.pk %}">Редактировать</a>
+    <a class="btn btn-danger" href="{% url 'mailmaster:mailing_delete' mailing.pk %}">Удалить</a>
+    <a class="btn btn-secondary" href="{% url 'mailmaster:mailing_list' %}">Назад</a>
+</div>
+{% endif %}
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}
