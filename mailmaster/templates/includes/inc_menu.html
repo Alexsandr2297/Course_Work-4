@@ -1,0 +1,67 @@
+<div class="collapse text-bg-dark" id="navbarHeader">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+                <h4>Сервис рассылок</h4>
+                <p class="text-body-secondary">
+                    Управление рассылками, получателями и сообщениями
+                </p>
+            </div>
+            <div class="col-sm-4 offset-md-1 py-4">
+                <h4>Навигация</h4>
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="{% url 'mailmaster:mailmaster_list' %}" class="text-white">Рассылки</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'mailmaster:recipient_list' %}" class="text-white">Получатели</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'mailmaster:message_list' %}" class="text-white">Сообщения</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    {% if perms.users.can_view_users %}
+                    <li>
+                        <a href="{% url 'users:user_list' %}" class="text-white">Пользователи</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <span class="text-white"> {{ user.email }}</span>
+                    </li>
+                    <li>
+                        <form method="post" action="{% url 'users:logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link text-white p-0 m-0"
+                                    style="text-decoration: none;">Выход
+                            </button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{% url 'users:login' %}" class="text-white">Вход</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'users:register' %}" class="text-white">Регистрация</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a href="{% url 'mailmaster:mailmaster_list' %}" class="navbar-brand d-flex align-items-center">
+             Рассылки
+        </a>
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarHeader"
+                aria-controls="navbarHeader"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>

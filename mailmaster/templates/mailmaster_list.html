@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <a href="{% url 'mailmaster:recipient_create' %}" class="btn btn-success"> Добавить получателя</a>
+                <a href="{% url 'mailmaster:message_create' %}" class="btn btn-success"> Добавить сообщение</a>
+                <a href="{% url 'mailmaster:mailing_create' %}" class="btn btn-primary"> Создать рассылку</a>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% if recipients %}
+                <!-- Получатели -->
+                {% for recipient in recipients %}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipient.full_name }}</h5>
+                            <p class="card-text"><strong>Email:</strong> {{ recipient.email }}</p>
+                            <p class="card-text"><strong>Комментарий:</strong> {{ recipient.comment|truncatechars:50|default:"—" }}</p>
+                            <div class="btn-group">
+                                <a class="btn btn-sm btn-primary" href="{% url 'mailmaster:recipient_detail' recipient.pk %}">Открыть</a>
+                                <a class="btn btn-sm btn-warning" href="{% url 'mailmaster:recipient_update' recipient.pk %}">Изменить</a>
+                                <a class="btn btn-sm btn-danger" href="{% url 'mailmaster:recipient_delete' recipient.pk %}">Удалить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if mailings %}
+                <!-- Рассылки -->
+                {% for mailing in mailings %}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Рассылка #{{ mailing.id }}</h5>
+                            <p class="card-text">
+                                <strong>Статус:</strong>
+                                <span class="badge {% if mailing.status == 'Создана' %}bg-secondary{% elif mailing.status == 'Запущена' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ mailing.status }}
+                                </span>
+                            </p>
+                            <p class="card-text"><strong>Тема:</strong> {{ mailing.message.subject_letter|truncatechars:50 }}</p>
+                            <p class="card-text"><strong>Начало:</strong> {{ mailing.start_time|date:"d.m.Y H:i" }}</p>
+                            <p class="card-text"><strong>Получателей:</strong> {{ mailing.recipients.count }}</p>
+                            <div class="btn-group">
+                                <a class="btn btn-sm btn-primary" href="{% url 'mailmaster:mailing_detail' mailing.pk %}">Открыть</a>
+                                <a class="btn btn-sm btn-warning" href="{% url 'mailmaster:mailing_update' mailing.pk %}">Изменить</a>
+                                <a class="btn btn-sm btn-danger" href="{% url 'mailmaster:mailing_delete' mailing.pk %}">Удалить</a>
+                                <a class="btn btn-sm btn-success" href="{% url 'mailmaster:send_mailing' mailing.pk %}">Запустить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
